@@ -7,7 +7,9 @@ namespace TaskManagement.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin,User")]
+    [Authorize]
+    //[Authorize(Roles ="Admin,User")]
+    //[Authorize(Policy = "RequireAdminRole")]
     public class TasksController : ControllerBase
     {
         private readonly AppDbContext _context;

@@ -88,7 +88,12 @@ builder.Services.AddSwaggerGen(c =>
                 }
             });
 });
-    
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin,User"));
+});
+
 
 
 var app = builder.Build();
@@ -102,6 +107,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
