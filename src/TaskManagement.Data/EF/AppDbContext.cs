@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using TaskManagement.Models;
+using TaskManagement.Core.Models;
 
-namespace TaskManagement.Data
+namespace TaskManagement.Data.EF
 {
     public class AppDbContext : IdentityDbContext<ApplicationUser>
     {
@@ -13,7 +13,7 @@ namespace TaskManagement.Data
             base.OnModelCreating(modelBuilder);
         }
 
-        public DbSet<Models.Task> Task { get; set; } = default!;
+        public DbSet<Core.Models.Task> Task { get; set; } = default!;
 
         public DbSet<ApplicationUser> ApplicationUser { get; set; }
     }

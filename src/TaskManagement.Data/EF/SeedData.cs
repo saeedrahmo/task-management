@@ -1,16 +1,17 @@
-﻿namespace TaskManagement.Data
+﻿namespace TaskManagement.Data.EF
 {
     using Microsoft.AspNetCore.Identity;
     using Microsoft.Extensions.DependencyInjection;
     using System;
     using System.Threading.Tasks;
+   
 
     public static class SeedData
     {
         public static async Task Initialize(IServiceProvider serviceProvider)
         {
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            var userManager = serviceProvider.GetRequiredService<UserManager<Models.ApplicationUser>>();
+            var userManager = serviceProvider.GetRequiredService<UserManager<Core.Models.ApplicationUser>>();
 
             // Create roles
             await CreateRoles(roleManager);
@@ -32,12 +33,12 @@
             }
         }
 
-        private static async Task CreateUsers(UserManager<Models.ApplicationUser> userManager)
+        private static async Task CreateUsers(UserManager<Core.Models.ApplicationUser> userManager)
         {
             var users = new[]
             {
-            new Models.ApplicationUser { UserName = "admin"},
-            new Models.ApplicationUser { UserName = "user" }
+            new Core.Models.ApplicationUser { UserName = "admin"},
+            new Core.Models.ApplicationUser { UserName = "user" }
             };
 
             foreach (var user in users)

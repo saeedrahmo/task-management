@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using TaskManagement.Core.Enums;
 
-namespace TaskManagement.Models
+namespace TaskManagement.Core.Models
 {
     /*
      Title (required) 

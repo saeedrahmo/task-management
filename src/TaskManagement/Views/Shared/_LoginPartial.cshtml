@@ -1,12 +1,17 @@
 ﻿@using Microsoft.AspNetCore.Identity
 
-@inject SignInManager<ApplicationUser> SignInManager
-@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<TaskManagement.Core.Models.ApplicationUser> SignInManager
+@inject UserManager<TaskManagement.Core.Models.ApplicationUser> UserManager
+
 
 <ul class="navbar-nav">
-    @if (SignInManager.IsSignedIn(User))
+
+   
+    @*@if (SignInManager.IsSignedIn(User))*@
+    @if (User.Identity.IsAuthenticated)
     {
         <li class="nav-item">
+            @*<div id="manage" class="nav-link text-dark">Hello @identity.Name!</div>*@
             <div id="manage" class="nav-link text-dark">Hello @UserManager.GetUserName(User)!</div>
             @*<a id="manage" class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @UserManager.GetUserName(User)!</a>*@
         </li>

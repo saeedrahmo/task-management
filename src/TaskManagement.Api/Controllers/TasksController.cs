@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TaskManagement.Data;
-using TaskManagement.Models;
+using TaskManagement.Data.EF;
 
-namespace TaskManagement.Controllers
+namespace TaskManagement.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin,User")]
     public class TasksController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -23,7 +19,7 @@ namespace TaskManagement.Controllers
 
         // GET: api/Tasks
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Models.Task>>> GetTask()
+        public async Task<ActionResult<IEnumerable<Core.Models.Task>>> GetTask()
         {
             if (_context.Task == null)
             {
@@ -34,7 +30,7 @@ namespace TaskManagement.Controllers
 
         // GET: api/Tasks/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Models.Task>> GetTask(int id)
+        public async Task<ActionResult<Core.Models.Task>> GetTask(int id)
         {
             if (_context.Task == null)
             {
@@ -53,7 +49,7 @@ namespace TaskManagement.Controllers
         // PUT: api/Tasks/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTask(int id, Models.Task task)
+        public async Task<IActionResult> PutTask(int id, Core.Models.Task task)
         {
             if (id != task.Id)
             {
@@ -84,7 +80,7 @@ namespace TaskManagement.Controllers
         // POST: api/Tasks
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Models.Task>> PostTask(Models.Task task)
+        public async Task<ActionResult<Core.Models.Task>> PostTask(Core.Models.Task task)
         {
             if (_context.Task == null)
             {

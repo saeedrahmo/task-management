@@ -4,14 +4,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using TaskManagement.Data;
+using TaskManagement.Data.EF;
 
 #nullable disable
 
-namespace TaskManagement.Migrations
+namespace TaskManagement.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230602015832_Initial")]
+    [Migration("20230602185820_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -151,7 +151,7 @@ namespace TaskManagement.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("TaskManagement.Models.ApplicationUser", b =>
+            modelBuilder.Entity("TaskManagement.Core.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
@@ -215,7 +215,7 @@ namespace TaskManagement.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("TaskManagement.Models.Task", b =>
+            modelBuilder.Entity("TaskManagement.Core.Models.Task", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -261,7 +261,7 @@ namespace TaskManagement.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("TaskManagement.Models.ApplicationUser", null)
+                    b.HasOne("TaskManagement.Core.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -270,7 +270,7 @@ namespace TaskManagement.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("TaskManagement.Models.ApplicationUser", null)
+                    b.HasOne("TaskManagement.Core.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -285,7 +285,7 @@ namespace TaskManagement.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TaskManagement.Models.ApplicationUser", null)
+                    b.HasOne("TaskManagement.Core.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -294,23 +294,23 @@ namespace TaskManagement.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("TaskManagement.Models.ApplicationUser", null)
+                    b.HasOne("TaskManagement.Core.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("TaskManagement.Models.Task", b =>
+            modelBuilder.Entity("TaskManagement.Core.Models.Task", b =>
                 {
-                    b.HasOne("TaskManagement.Models.ApplicationUser", "User")
+                    b.HasOne("TaskManagement.Core.Models.ApplicationUser", "User")
                         .WithMany("Tasks")
                         .HasForeignKey("UserId");
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TaskManagement.Models.ApplicationUser", b =>
+            modelBuilder.Entity("TaskManagement.Core.Models.ApplicationUser", b =>
                 {
                     b.Navigation("Tasks");
                 });

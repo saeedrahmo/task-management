@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using TaskManagement.Areas.Identity.Models;
-using TaskManagement.Models;
+using TaskManagement.Core.Models;
 
 namespace TaskManagement.Areas.Identity.Controllers
 {
@@ -37,6 +38,9 @@ namespace TaskManagement.Areas.Identity.Controllers
                 var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
+                    // Clear existing external cookie to ensure a clean login process
+                    await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+
                     if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                     {
                         return Redirect(returnUrl);

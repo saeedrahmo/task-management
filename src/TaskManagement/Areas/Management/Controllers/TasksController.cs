@@ -3,8 +3,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
-using TaskManagement.Data;
-using TaskManagement.Models;
+using TaskManagement.Core.Enums;
+using TaskManagement.Core.Models;
+using TaskManagement.Data.EF;
 
 namespace TaskManagement.Areas.Management.Controllers
 {
@@ -76,7 +77,7 @@ namespace TaskManagement.Areas.Management.Controllers
             }
 
 
-            var list = await query.Include(x => x.User).Select(x => new Models.Task
+            var list = await query.Include(x => x.User).Select(x => new Core.Models.Task
             {
                 Id = x.Id,
                 Title = x.Title,
@@ -102,7 +103,7 @@ namespace TaskManagement.Areas.Management.Controllers
             //var task = await _context.Task
             //    .FirstOrDefaultAsync(m => m.Id == id);
 
-            var task = await _context.Task.Include(x => x.User).Select(x => new TaskManagement.Models.Task
+            var task = await _context.Task.Include(x => x.User).Select(x => new Core.Models.Task
             {
                 Id = x.Id,
                 Title = x.Title,
@@ -127,7 +128,7 @@ namespace TaskManagement.Areas.Management.Controllers
         {
 
             var users = await _userManager.Users.Select(x => new ApplicationUser { Id = x.Id, UserName = x.UserName }).ToListAsync();
-            var task = new TaskManagement.Models.Task() { Users = users, };
+            var task = new Core.Models.Task() { Users = users, };
 
             return View(task);
         }
@@ -137,7 +138,7 @@ namespace TaskManagement.Areas.Management.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Description,DueDate,Priority,Status,Assignee,UserId")] TaskManagement.Models.Task task)
+        public async Task<IActionResult> Create([Bind("Id,Title,Description,DueDate,Priority,Status,Assignee,UserId")] Core.Models.Task task)
         {
             if (ModelState.IsValid)
             {
@@ -174,7 +175,7 @@ namespace TaskManagement.Areas.Management.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,DueDate,Priority,Status,Assignee,UserId")] TaskManagement.Models.Task task)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,DueDate,Priority,Status,Assignee,UserId")] TaskManagement.Core.Models.Task task)
         {
             if (id != task.Id)
             {
@@ -215,7 +216,7 @@ namespace TaskManagement.Areas.Management.Controllers
             //var task = await _context.Task
             //    .FirstOrDefaultAsync(m => m.Id == id);
 
-            var task = await _context.Task.Include(x => x.User).Select(x => new TaskManagement.Models.Task
+            var task = await _context.Task.Include(x => x.User).Select(x => new TaskManagement.Core.Models.Task
             {
                 Id = x.Id,
                 Title = x.Title,
