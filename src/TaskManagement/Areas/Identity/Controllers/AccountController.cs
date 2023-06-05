@@ -13,11 +13,13 @@ namespace TaskManagement.Areas.Identity.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<AccountController> _logger;
 
-        public AccountController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ILogger<AccountController> logger)
+        public AccountController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager
+            //, ILogger<AccountController> logger
+            )
         {
             _signInManager = signInManager;
             _userManager = userManager;
-            _logger = logger;
+            //_logger = logger;
         }
 
         [HttpGet]

@@ -23,13 +23,15 @@ namespace TaskManagement.Areas.Management.Controllers
         }
 
         // GET: Management/Tasks
-        public async Task<IActionResult> Index(string searchQuery, string sortOrder)
+        public async Task<IActionResult> Index(string searchQuery, string sortOrder, int pageNumber = 1, int pageSize = 3)
         {
             if (_context.Task == null)
                 return Problem("Entity set 'AppDbContext.Task'  is null.");
 
             var query = _context.Task.AsQueryable();
             ViewData["SortOrder"] = sortOrder;
+            ViewData["PageNumber"] = pageNumber;
+            ViewData["PageSize"] = pageSize;
 
             if (!string.IsNullOrEmpty(searchQuery))
             {
@@ -77,7 +79,7 @@ namespace TaskManagement.Areas.Management.Controllers
             }
 
 
-            var list = await query.Include(x => x.User).Select(x => new Core.Models.Task
+            query=  query.Include(x => x.User).Select(x => new Core.Models.Task
             {
                 Id = x.Id,
                 Title = x.Title,
@@ -87,7 +89,13 @@ namespace TaskManagement.Areas.Management.Controllers
                 Status = x.Status,
                 UserId = x.UserId,
                 Description = x.Description,
-            }).ToListAsync();
+            }).AsQueryable();
+
+            var totalCount =await query.CountAsync();
+            var list = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            ViewData["TotalCount"] = totalCount;
+            ViewData["TotalPages"] = (int)Math.Ceiling((double)totalCount / pageSize);
 
             return View(list);
         }
@@ -99,9 +107,6 @@ namespace TaskManagement.Areas.Management.Controllers
             {
                 return NotFound();
             }
-
-            //var task = await _context.Task
-            //    .FirstOrDefaultAsync(m => m.Id == id);
 
             var task = await _context.Task.Include(x => x.User).Select(x => new Core.Models.Task
             {
@@ -134,8 +139,7 @@ namespace TaskManagement.Areas.Management.Controllers
         }
 
         // POST: Management/Tasks/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // To protect from overposting attacks, enable the specific properties you want to bind to.        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Title,Description,DueDate,Priority,Status,Assignee,UserId")] Core.Models.Task task)
@@ -171,8 +175,7 @@ namespace TaskManagement.Areas.Management.Controllers
         }
 
         // POST: Management/Tasks/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // To protect from overposting attacks, enable the specific properties you want to bind to.        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,DueDate,Priority,Status,Assignee,UserId")] TaskManagement.Core.Models.Task task)
