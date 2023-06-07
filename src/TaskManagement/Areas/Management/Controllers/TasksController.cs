@@ -6,6 +6,8 @@ using System.Globalization;
 using TaskManagement.Core.Enums;
 using TaskManagement.Core.Models;
 using TaskManagement.Data.EF;
+using TaskManagement.Data.RepositoryManager;
+using TaskManagement.Services.IService;
 
 namespace TaskManagement.Areas.Management.Controllers
 {
@@ -13,13 +15,18 @@ namespace TaskManagement.Areas.Management.Controllers
     [Area("Management")]
     public class TasksController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        //private readonly IRepositoryManager _rm;
+        private readonly IUnitOfWork _uow;
+        private readonly ITaskService _taskService;
 
-        public TasksController(AppDbContext context, UserManager<ApplicationUser> userManager)
+        public TasksController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IUnitOfWork uow, ITaskService taskService)
         {
             _context = context;
             _userManager = userManager;
+            _uow=uow; 
+            _taskService = taskService;
         }
 
         // GET: Management/Tasks
@@ -79,7 +86,7 @@ namespace TaskManagement.Areas.Management.Controllers
             }
 
 
-            query=  query.Include(x => x.User).Select(x => new Core.Models.Task
+            query = query.Include(x => x.User).Select(x => new Core.Models.Task
             {
                 Id = x.Id,
                 Title = x.Title,
@@ -91,7 +98,7 @@ namespace TaskManagement.Areas.Management.Controllers
                 Description = x.Description,
             }).AsQueryable();
 
-            var totalCount =await query.CountAsync();
+            var totalCount = await query.CountAsync();
             var list = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
 
             ViewData["TotalCount"] = totalCount;
@@ -146,8 +153,15 @@ namespace TaskManagement.Areas.Management.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(task);
-                await _context.SaveChangesAsync();
+                //_context.Add(task);
+                //await _context.SaveChangesAsync();
+
+                //_rm.TaskRepository.CreateTask(task);
+                //await _rm.SaveChanges();
+
+                _taskService.CreateTask(task);
+                await _uow.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
             return View(task);
@@ -160,7 +174,7 @@ namespace TaskManagement.Areas.Management.Controllers
             {
                 return NotFound();
             }
-            
+
             var task = await _context.Task
                .FirstOrDefaultAsync(m => m.Id == id);
 

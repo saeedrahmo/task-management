@@ -1,23 +1,40 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using SQLitePCL;
+using System.Threading.Tasks.Sources;
 using TaskManagement.Core.Models;
 using TaskManagement.Data.EF;
-
-//TODO: pagination of tasks
-//TODO: add error message  [Required(ErrorMessage = "Username is required")]
+using TaskManagement.Data.RepositoryBase;
+using TaskManagement.Data.RepositoryEntity.IRepository;
+using TaskManagement.Data.RepositoryEntity.Repository;
+using TaskManagement.Data.RepositoryManager;
+using TaskManagement.Services.IService;
+using TaskManagement.Services.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-      options.UseSqlite(builder.Configuration.GetConnectionString("SQLite") ?? throw new InvalidOperationException("Connection string 'SQLite' not found.")));
+//builder.Services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+//builder.Services.AddTransient<IRepositoryManager, RepositoryManager>();
+//builder.Services.AddTransient<ITaskRepository, TaskRepository>();
 
-//builder.Services.ConfigureSqliteContext(builder.Configuration);
+
+
+builder.Services.AddTransient<ITaskService, TaskService>();
+
+builder.Services.AddScoped<IUnitOfWork>(serviceProvider =>
+{
+    var context = serviceProvider.GetRequiredService<ApplicationDbContext>();    
+    return context;
+});
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+      options.UseSqlite(builder.Configuration.GetConnectionString("SQLite") ?? throw new InvalidOperationException("Connection string 'SQLite' not found.")));
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<ApplicationUser>()
     .AddRoles<IdentityRole>()
-       .AddEntityFrameworkStores<AppDbContext>();
+       .AddEntityFrameworkStores<ApplicationDbContext>();
 
 
 // Add services to the container.

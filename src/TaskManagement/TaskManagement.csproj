@@ -36,6 +36,7 @@
   <ItemGroup>
     <ProjectReference Include="..\TaskManagement.Core\TaskManagement.Core.csproj" />
     <ProjectReference Include="..\TaskManagement.Data\TaskManagement.Data.csproj" />
+    <ProjectReference Include="..\TaskManagement.Service\TaskManagement.Services.csproj" />
   </ItemGroup>
 
 </Project>

@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddDbContext<AppDbContext>(options =>
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("SQLite") ?? throw new InvalidOperationException("Connection string 'SQLite' not found.")));
 
 
@@ -20,7 +20,7 @@ builder.Services.AddIdentity<TaskManagement.Core.Models.ApplicationUser, Identit
 {
     
 })
-      .AddEntityFrameworkStores<AppDbContext>()
+      .AddEntityFrameworkStores<ApplicationDbContext>()
       .AddDefaultTokenProviders();
 
 

@@ -7,14 +7,12 @@ namespace TaskManagement.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
-    //[Authorize(Roles ="Admin,User")]
-    //[Authorize(Policy = "RequireAdminRole")]
+    [Authorize]    
     public class TasksController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public TasksController(AppDbContext context)
+        public TasksController(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -48,8 +46,7 @@ namespace TaskManagement.Api.Controllers
             return task;
         }
 
-        // PUT: api/Tasks/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        // PUT: api/Tasks/5        
         [HttpPut("{id}")]
         public async Task<IActionResult> PutTask(int id, Core.Models.Task task)
         {
@@ -79,8 +76,7 @@ namespace TaskManagement.Api.Controllers
             return NoContent();
         }
 
-        // POST: api/Tasks
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        // POST: api/Tasks        
         [HttpPost]
         public async Task<ActionResult<Core.Models.Task>> PostTask(Core.Models.Task task)
         {

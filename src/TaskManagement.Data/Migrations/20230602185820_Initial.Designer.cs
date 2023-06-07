@@ -10,7 +10,7 @@ using TaskManagement.Data.EF;
 
 namespace TaskManagement.Data.Migrations
 {
-    [DbContext(typeof(AppDbContext))]
+    [DbContext(typeof(ApplicationDbContext))]
     [Migration("20230602185820_Initial")]
     partial class Initial
     {
