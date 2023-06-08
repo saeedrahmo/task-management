@@ -1,12 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using SQLitePCL;
-using System.Threading.Tasks.Sources;
+using TaskManagement.Core.Mapper;
 using TaskManagement.Core.Models;
 using TaskManagement.Data.EF;
-using TaskManagement.Data.RepositoryBase;
-using TaskManagement.Data.RepositoryEntity.IRepository;
-using TaskManagement.Data.RepositoryEntity.Repository;
 using TaskManagement.Data.RepositoryManager;
 using TaskManagement.Services.IService;
 using TaskManagement.Services.Service;
@@ -17,13 +13,12 @@ var builder = WebApplication.CreateBuilder(args);
 //builder.Services.AddTransient<IRepositoryManager, RepositoryManager>();
 //builder.Services.AddTransient<ITaskRepository, TaskRepository>();
 
-
-
-builder.Services.AddTransient<ITaskService, TaskService>();
+builder.Services.AddScoped<ITaskService, TaskService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddScoped<IUnitOfWork>(serviceProvider =>
 {
-    var context = serviceProvider.GetRequiredService<ApplicationDbContext>();    
+    var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
     return context;
 });
 
@@ -39,6 +34,8 @@ builder.Services.AddDefaultIdentity<ApplicationUser>()
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 var app = builder.Build();
 

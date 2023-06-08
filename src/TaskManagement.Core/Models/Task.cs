@@ -45,11 +45,13 @@ Assignee (optional) - User who is assigned the task */
         public Status Status { get; set; }
 
         // UserName of the User Identity object
+        // Foreign key property (Id) referencing the User
+        [ForeignKey("User")]
         public string? Assignee { get; set; }
 
-        [ForeignKey("User")]
+        //[ForeignKey("User")]
         // Foreign key property (Id) referencing the User 
-        public string? UserId { get; set; }
+        //public string? UserId { get; set; }
 
 
         // Navigation property to the User Identity object

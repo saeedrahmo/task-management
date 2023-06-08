@@ -14,12 +14,12 @@ namespace TaskManagement.Areas.Identity.Controllers
         private readonly ILogger<AccountController> _logger;
 
         public AccountController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager
-            //, ILogger<AccountController> logger
+            , ILogger<AccountController> logger
             )
         {
             _signInManager = signInManager;
             _userManager = userManager;
-            //_logger = logger;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -41,7 +41,7 @@ namespace TaskManagement.Areas.Identity.Controllers
                 if (result.Succeeded)
                 {
                     // Clear existing external cookie to ensure a clean login process
-                    await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+                    //await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
                     if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                     {

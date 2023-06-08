@@ -15,8 +15,6 @@ namespace TaskManagement.Data.EF
             base.OnModelCreating(modelBuilder);
         }
 
-        public virtual DbSet<Core.Models.Task> Task { get; set; }
-
-        //public virtual DbSet<ApplicationUser> ApplicationUser { get; set; }
+        public virtual DbSet<Core.Models.Task> Task { get; set; } = default!;        
     }
 }

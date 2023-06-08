@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace TaskManagement.Data.Migrations
 {
-    public partial class Initial : Migration
+    public partial class Initialize : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -165,15 +165,14 @@ namespace TaskManagement.Data.Migrations
                     DueDate = table.Column<DateTime>(type: "date", nullable: false),
                     Priority = table.Column<int>(type: "INTEGER", nullable: false),
                     Status = table.Column<int>(type: "INTEGER", nullable: false),
-                    Assignee = table.Column<string>(type: "TEXT", nullable: true),
-                    UserId = table.Column<string>(type: "TEXT", nullable: true)
+                    Assignee = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Task", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Task_AspNetUsers_UserId",
-                        column: x => x.UserId,
+                        name: "FK_Task_AspNetUsers_Assignee",
+                        column: x => x.Assignee,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
                 });
@@ -216,9 +215,9 @@ namespace TaskManagement.Data.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Task_UserId",
+                name: "IX_Task_Assignee",
                 table: "Task",
-                column: "UserId");
+                column: "Assignee");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

@@ -11,8 +11,8 @@ using TaskManagement.Data.EF;
 namespace TaskManagement.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230602185820_Initial")]
-    partial class Initial
+    [Migration("20230607145404_Initialize")]
+    partial class Initialize
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -240,12 +240,9 @@ namespace TaskManagement.Data.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("TEXT");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("Assignee");
 
                     b.ToTable("Task");
                 });
@@ -305,7 +302,7 @@ namespace TaskManagement.Data.Migrations
                 {
                     b.HasOne("TaskManagement.Core.Models.ApplicationUser", "User")
                         .WithMany("Tasks")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("Assignee");
 
                     b.Navigation("User");
                 });

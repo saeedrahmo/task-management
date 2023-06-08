@@ -1,11 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Globalization;
-using TaskManagement.Core.Enums;
-using TaskManagement.Core.Models;
-using TaskManagement.Data.EF;
+using TaskManagement.Controllers;
+using TaskManagement.Core.DTOs;
 using TaskManagement.Data.RepositoryManager;
 using TaskManagement.Services.IService;
 
@@ -13,93 +11,33 @@ namespace TaskManagement.Areas.Management.Controllers
 {
     [Authorize(Roles = "Admin,User")]
     [Area("Management")]
-    public class TasksController : Controller
-    {
-        private readonly ApplicationDbContext _context;
-        private readonly UserManager<ApplicationUser> _userManager;
-        //private readonly IRepositoryManager _rm;
-        private readonly IUnitOfWork _uow;
+    public class TasksController : BaseController<TasksController>
+    {        
         private readonly ITaskService _taskService;
+        private readonly IUserService _userService;
 
-        public TasksController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IUnitOfWork uow, ITaskService taskService)
-        {
-            _context = context;
-            _userManager = userManager;
-            _uow=uow; 
+        public TasksController(ILogger<TasksController> logger, IUnitOfWork uow, IMapper mapper, ITaskService taskService, IUserService userService) : base(logger, uow, mapper)
+        {            
             _taskService = taskService;
+            _userService = userService;            
         }
-
+        
         // GET: Management/Tasks
         public async Task<IActionResult> Index(string searchQuery, string sortOrder, int pageNumber = 1, int pageSize = 3)
         {
-            if (_context.Task == null)
-                return Problem("Entity set 'AppDbContext.Task'  is null.");
+            // TODO: limit list by userId if the user is not admin
 
-            var query = _context.Task.AsQueryable();
+            //return Problem("Entity set 'AppDbContext.Task'  is null.");
+
             ViewData["SortOrder"] = sortOrder;
             ViewData["PageNumber"] = pageNumber;
             ViewData["PageSize"] = pageSize;
 
-            if (!string.IsNullOrEmpty(searchQuery))
-            {
-                if (Enum.TryParse(searchQuery, true, out Status parsedStatus))
-                {
-                    query = query.Where(item => item.Status == parsedStatus).AsQueryable();
-                }
-                else if (Enum.TryParse(searchQuery, true, out Priority parsedPriority))
-                {
-                    query = query.Where(item => item.Priority == parsedPriority).AsQueryable();
-                }
-                else if (DateTime.TryParseExact(searchQuery, "MM/dd/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDate)) //"yyyy-MM-dd" "MM/dd/yyyy"
-                {
-                    query = query.Where(item => item.DueDate == parsedDate.Date).AsQueryable();
-                }
-            }
+            var result = await _taskService.GetPagedTaskList(searchQuery, sortOrder, pageNumber, pageSize);
+            var totalCount = result.Count;
+            var items = result.Items;
 
-            if (!string.IsNullOrEmpty(sortOrder))
-            {
-                // Apply sorting based on the sortOrder parameter
-                switch (sortOrder.ToLower())
-                {
-                    case "priority_desc":
-                        query = query.OrderByDescending(item => item.Priority).AsQueryable();
-                        break;
-                    case "priority_asc":
-                        query = query.OrderBy(item => item.Priority).AsQueryable();
-                        break;
-                    case "status_desc":
-                        query = query.OrderByDescending(item => item.Status).AsQueryable();
-                        break;
-                    case "status_asc":
-                        query = query.OrderBy(item => item.Status).AsQueryable();
-                        break;
-                    case "duedate_desc":
-                        query = query.OrderByDescending(item => item.DueDate).AsQueryable();
-                        break;
-                    case "duedate_asc":
-                        query = query.OrderBy(item => item.DueDate).AsQueryable();
-                        break;
-                    default:
-                        query = query.OrderBy(item => item.Title).AsQueryable();
-                        break;
-                }
-            }
-
-
-            query = query.Include(x => x.User).Select(x => new Core.Models.Task
-            {
-                Id = x.Id,
-                Title = x.Title,
-                Assignee = x.User != null ? x.User.UserName : string.Empty,
-                DueDate = x.DueDate,
-                Priority = x.Priority,
-                Status = x.Status,
-                UserId = x.UserId,
-                Description = x.Description,
-            }).AsQueryable();
-
-            var totalCount = await query.CountAsync();
-            var list = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+            List<PagedTaskListDto> list = _mapper.ProjectTo<PagedTaskListDto>(items.AsQueryable()).ToList();
 
             ViewData["TotalCount"] = totalCount;
             ViewData["TotalPages"] = (int)Math.Ceiling((double)totalCount / pageSize);
@@ -110,22 +48,13 @@ namespace TaskManagement.Areas.Management.Controllers
         // GET: Management/Tasks/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Task == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var task = await _context.Task.Include(x => x.User).Select(x => new Core.Models.Task
-            {
-                Id = x.Id,
-                Title = x.Title,
-                Assignee = x.User != null ? x.User.UserName : string.Empty,
-                DueDate = x.DueDate,
-                Priority = x.Priority,
-                Status = x.Status,
-                //UserId = x.UserId,
-                Description = x.Description,
-            }).FirstOrDefaultAsync(x => x.Id == id);
+            var obj = await _taskService.GetByIdIncludeUser(id);
+            var task = _mapper.Map<ReadTaskDto>(obj);
 
             if (task == null)
             {
@@ -138,9 +67,11 @@ namespace TaskManagement.Areas.Management.Controllers
         // GET: Management/Tasks/Create
         public async Task<IActionResult> Create()
         {
+            // TODO: limit action's access to the user with admin role 
 
-            var users = await _userManager.Users.Select(x => new ApplicationUser { Id = x.Id, UserName = x.UserName }).ToListAsync();
-            var task = new Core.Models.Task() { Users = users, };
+            var users = await _userService.GetUserList();
+            List<UserListDto> usersDto = _mapper.ProjectTo<UserListDto>(users.AsQueryable()).ToList();
+            var task = new CreateTaskDto() { Users = usersDto };
 
             return View(task);
         }
@@ -149,17 +80,12 @@ namespace TaskManagement.Areas.Management.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Description,DueDate,Priority,Status,Assignee,UserId")] Core.Models.Task task)
+        public async Task<IActionResult> Create([Bind("Title,Description,DueDate,Priority,Status,Assignee")] CreateTaskDto task)
         {
             if (ModelState.IsValid)
             {
-                //_context.Add(task);
-                //await _context.SaveChangesAsync();
-
-                //_rm.TaskRepository.CreateTask(task);
-                //await _rm.SaveChanges();
-
-                _taskService.CreateTask(task);
+                Core.Models.Task obj = _mapper.Map<Core.Models.Task>(task);
+                _taskService.CreateTask(obj);
                 await _uow.SaveChangesAsync();
 
                 return RedirectToAction(nameof(Index));
@@ -170,20 +96,22 @@ namespace TaskManagement.Areas.Management.Controllers
         // GET: Management/Tasks/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Task == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var task = await _context.Task
-               .FirstOrDefaultAsync(m => m.Id == id);
+            var obj = await _taskService.GetById(id);
+            var task = _mapper.Map<UpdateTaskDto>(obj);
 
             if (task == null)
             {
                 return NotFound();
             }
-            var users = await _userManager.Users.Select(x => new ApplicationUser { Id = x.Id, UserName = x.UserName }).ToListAsync();
-            task.Users = users;
+
+            var users = await _userService.GetUserList();
+            List<UserListDto> usersDto = _mapper.ProjectTo<UserListDto>(users.AsQueryable()).ToList();
+            task.Users = usersDto;
 
             return View(task);
         }
@@ -192,7 +120,7 @@ namespace TaskManagement.Areas.Management.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,DueDate,Priority,Status,Assignee,UserId")] TaskManagement.Core.Models.Task task)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,DueDate,Priority,Status,Assignee,UserId")] UpdateTaskDto task)
         {
             if (id != task.Id)
             {
@@ -203,12 +131,13 @@ namespace TaskManagement.Areas.Management.Controllers
             {
                 try
                 {
-                    _context.Update(task);
-                    await _context.SaveChangesAsync();
+                    var obj = _mapper.Map<Core.Models.Task>(task);
+                    _taskService.UpdateTask(obj);
+                    await _uow.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TaskExists(task.Id))
+                    if (!_taskService.TaskExists(task.Id))
                     {
                         return NotFound();
                     }
@@ -225,25 +154,13 @@ namespace TaskManagement.Areas.Management.Controllers
         // GET: Management/Tasks/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Task == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            //var task = await _context.Task
-            //    .FirstOrDefaultAsync(m => m.Id == id);
-
-            var task = await _context.Task.Include(x => x.User).Select(x => new TaskManagement.Core.Models.Task
-            {
-                Id = x.Id,
-                Title = x.Title,
-                Assignee = x.User != null ? x.User.UserName : string.Empty,
-                DueDate = x.DueDate,
-                Priority = x.Priority,
-                Status = x.Status,
-                //UserId = x.UserId,
-                Description = x.Description,
-            }).FirstOrDefaultAsync(x => x.Id == id);
+            var obj = await _taskService.GetByIdIncludeUser(id);
+            var task = _mapper.Map<DeleteTaskDto>(obj);
 
             if (task == null)
             {
@@ -258,23 +175,17 @@ namespace TaskManagement.Areas.Management.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Task == null)
-            {
-                return Problem("Entity set 'AppDbContext.Task'  is null.");
-            }
-            var task = await _context.Task.FindAsync(id);
+
+            //return Problem("Entity set 'AppDbContext.Task'  is null.");
+
+            var task = await _taskService.GetById(id);
             if (task != null)
             {
-                _context.Task.Remove(task);
+                _taskService.DeleteTask(task);
             }
 
-            await _context.SaveChangesAsync();
+            await _uow.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool TaskExists(int id)
-        {
-            return (_context.Task?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

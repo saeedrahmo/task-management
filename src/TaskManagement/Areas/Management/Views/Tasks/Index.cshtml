@@ -1,4 +1,4 @@
-﻿@model IEnumerable<TaskManagement.Core.Models.Task>
+﻿@model IEnumerable<TaskManagement.Core.DTOs.PagedTaskListDto>
 
 @{
     ViewData["Title"] = "Index";
@@ -79,7 +79,7 @@
 <div class="pagination">
     @if ((int)(ViewData["PageNumber"] ?? 0) > 1)
     {
-        <a class="page-link" asp-action="Index" asp-controller="Tasks" asp-area="Management" asp-route-pageNumber="@((int)(ViewData[" PageNumber"]??0) - 1)" >Previous</a>
+        <a class="page-link" asp-action="Index" asp-controller="Tasks" asp-area="Management" asp-route-pageNumber="@((int)(ViewData["PageNumber"]??0) - 1)" >Previous</a>
     }
 
     @for (int i = 1; i <= (int)(ViewData["TotalPages"]??0); i++)
@@ -89,6 +89,6 @@
 
     @if ((int)(ViewData["PageNumber"] ?? 0) < (int)(ViewData["TotalPages"] ?? 0))
     {
-        <a class="page-link" asp-action="Index" asp-controller="Tasks" asp-area="Management" asp-route-pageNumber="@((int)(ViewData[" PageNumber"]??0) + 1)">Next</a>
+        <a class="page-link" asp-action="Index" asp-controller="Tasks" asp-area="Management" asp-route-pageNumber="@((int)(ViewData["PageNumber"]??0) + 1)">Next</a>
     }
 </div>

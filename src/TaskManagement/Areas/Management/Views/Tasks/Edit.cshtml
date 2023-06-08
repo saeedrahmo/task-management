@@ -1,4 +1,4 @@
-﻿@model TaskManagement.Core.Models.Task
+﻿@model TaskManagement.Core.DTOs.UpdateTaskDto
 @using TaskManagement.Core.Enums
 
 @{
@@ -54,16 +54,16 @@
                 <span asp-validation-for="Status" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="UserId" class="control-label"></label>
+                <label asp-for="Assignee" class="control-label"></label>
                 @*<input asp-for="Assignee" class="form-control" />*@
-                <select asp-for="UserId" class="form-control">
+                <select asp-for="Assignee" class="form-control">
                     <option value="">Select Assignee</option>
                     @foreach (var item in Model.Users)
                     {
                         <option value="@item.Id">@item.UserName</option>
                     }
                 </select>
-                <span asp-validation-for="UserId" class="text-danger"></span>
+                <span asp-validation-for="Assignee" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
