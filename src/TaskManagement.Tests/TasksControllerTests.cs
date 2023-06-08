@@ -1,14 +1,8 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using Moq;
-using System.Security.Claims;
-using TaskManagement.Areas.Identity.Controllers;
 using TaskManagement.Areas.Management.Controllers;
-using TaskManagement.Controllers;
 using TaskManagement.Core.DTOs;
 using TaskManagement.Core.Mapper;
 using TaskManagement.Data.RepositoryManager;

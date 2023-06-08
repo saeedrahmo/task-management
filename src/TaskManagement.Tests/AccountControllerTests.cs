@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -17,17 +16,7 @@ namespace TaskManagement.Tests
         private readonly Mock<ILogger<AccountController>> _mockLogger;
 
         public AccountControllerTests()
-        {
-            //_mockSignInManager = new Mock<SignInManager<Core.Models.ApplicationUser>>(Mock.Of<UserManager<Core.Models.ApplicationUser>>(),
-            //    new Mock<IHttpContextAccessor>().Object,
-            //    new Mock<IUserClaimsPrincipalFactory<Core.Models.ApplicationUser>>().Object,
-            //    null,
-            //    null,
-            //    null,
-            //    null);
-
-            //_mockUserManager = new Mock<UserManager<Core.Models.ApplicationUser>>(Mock.Of<IUserStore<Core.Models.ApplicationUser>>(), null, null, null, null, null, null, null, null);
-
+        {            
             _mockUserManager = new Mock<UserManager<Core.Models.ApplicationUser>>(
     /* IUserStore<TUser> store */Mock.Of<IUserStore<Core.Models.ApplicationUser>>(),
     /* IOptions<IdentityOptions> optionsAccessor */null,
